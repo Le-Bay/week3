@@ -10,6 +10,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
+import java.util.regex.Pattern
+
 
 class SignupActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySignupBinding
@@ -22,7 +24,7 @@ class SignupActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this,R.layout.activity_signup)
         viewModelFactory = SignupViewModelFactory("bay","bay@gmail.com","123")
-        viewModel= ViewModelProvider(this).get(SignupViewModel::class.java)
+        viewModel= ViewModelProvider(this,viewModelFactory).get(SignupViewModel::class.java)
         binding.apply {
 
             editTextTextPersonName.setOnClickListener {
@@ -44,9 +46,17 @@ class SignupActivity : AppCompatActivity() {
             binding.LoginButton.setOnClickListener {
             if (email.isEmpty()) {
                 binding.editTextTextPersonName2.error = "Please enter the email"
-            } else if (password.isEmpty()) {
+            }
+            else if ( !isEmailValid(email)) {
+                binding.editTextTextPersonName2.error = "Please enter correct format"
+            }
+            else if (password.isEmpty()) {
                 binding.editTextTextPassword.error = "Please enter the password"
-            } else {
+            }
+            else if (!isPasswordValid(password)) {
+                binding.editTextTextPassword.error = "Please enter correct format"
+            }
+            else {
 
                 Toast.makeText(this, "Login complete", Toast.LENGTH_LONG).show()
 
@@ -64,6 +74,19 @@ class SignupActivity : AppCompatActivity() {
             startActivity(intent)
         }
     }
+    fun isEmailValid(email: String): Boolean {
+        return Pattern.compile(
+                "^[a-zA-Z][\\\\w-]+@([\\\\w]+\\\\.[\\\\w]+|[\\\\w]+\\\\.[\\\\w]{2,}\\\\.[\\\\w]{2,})\$"
 
+        ).matcher(email).matches()
+    }
+    fun isPasswordValid(password: String): Boolean {
+        return Pattern.compile(
+                "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%!\\-_?&])(?=\\S+$).{8,}"
+        ).matcher(password).matches(
+
+        )
+    }
+}
 
 }
